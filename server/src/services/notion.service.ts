@@ -35,14 +35,17 @@ export class NotionService {
   async readStory(pageId: string): Promise<Story> {
     try {
       const page = await this.notion.pages.retrieve({ page_id: pageId });
-      const properties = page.properties;
 
-      // Extract title
-      const titleProperty = properties.title as any;
+      // Type assertion for properties access
+      const pageWithProperties = page as any;
+      const properties = pageWithProperties.properties;
+
+      // Extract title from properties (can be 'name' or 'title')
+      const titleProperty = properties?.name || properties?.title;
       const title = titleProperty?.title?.[0]?.plain_text || 'Untitled';
 
       // Extract status
-      const statusProperty = properties.Status as any;
+      const statusProperty = properties?.Status;
       const status = statusProperty?.status?.name || 'pending';
 
       return {
@@ -51,9 +54,10 @@ export class NotionService {
         content: '',
         status: status as any,
       };
-    } catch (error) {
-      this.logger.error(`Failed to read story ${pageId}: ${error.message}`);
-      throw new Error(`Notion API error: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? String(error.message) : 'Unknown error';
+      this.logger.error(`Failed to read story ${pageId}: ${errorMessage}`);
+      throw new Error(`Notion API error: ${errorMessage}`);
     }
   }
 
@@ -84,9 +88,10 @@ export class NotionService {
 
       this.logger.log(`Updated Notion page ${pageId}: ${status}`);
       return { success: true };
-    } catch (error) {
-      this.logger.error(`Failed to update Notion page ${pageId}: ${error.message}`);
-      throw new Error(`Notion API error: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? String(error.message) : 'Unknown error';
+      this.logger.error(`Failed to update Notion page ${pageId}: ${errorMessage}`);
+      throw new Error(`Notion API error: ${errorMessage}`);
     }
   }
 
@@ -104,8 +109,9 @@ export class NotionService {
           },
         ],
       });
-    } catch (error) {
-      this.logger.warn(`Failed to append log to ${pageId}: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? String(error.message) : 'Unknown error';
+      this.logger.warn(`Failed to append log to ${pageId}: ${errorMessage}`);
     }
   }
 
@@ -118,8 +124,9 @@ export class NotionService {
       try {
         await operation();
         return;
-      } catch (error: any) {
-        if (error.message.includes('rate_limit')) {
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? String(error.message) : 'Unknown error';
+        if (errorMessage.includes('rate_limit')) {
           this.logger.warn(
             `Rate limited, retrying (${attempt}/${maxRetries})...`,
           );

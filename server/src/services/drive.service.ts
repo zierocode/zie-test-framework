@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { google } from 'googleapis';
+import type { drive_v3 } from 'googleapis';
 
 export interface DriveFile {
   id: string;
@@ -19,7 +20,7 @@ export interface UploadResult {
 @Injectable()
 export class DriveService {
   private readonly logger = new Logger(DriveService.name);
-  private drive: google.drive_v3.Drive;
+  private drive: drive_v3.Drive;
 
   constructor(private configService: ConfigService) {
     const credentials = this.loadServiceAccountCredentials();
@@ -37,8 +38,6 @@ export class DriveService {
       throw new Error('GOOGLE_SERVICE_ACCOUNT_KEY is required');
     }
 
-    // In production, this would load from a file
-    // For now, we'll create a mock auth
     const { GoogleAuth } = require('google-auth-library');
     return new GoogleAuth({
       keyFilename: keyFilePath,
@@ -63,10 +62,11 @@ export class DriveService {
       });
 
       this.logger.log(`Created Drive folder: ${name} (${file.data.id})`);
-      return { id: file.data.id, name };
-    } catch (error) {
-      this.logger.error(`Failed to create folder: ${error.message}`);
-      throw new Error(`Drive API error: ${error.message}`);
+      return { id: file.data.id || '', name };
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`Failed to create folder: ${errorMessage}`);
+      throw new Error(`Drive API error: ${errorMessage}`);
     }
   }
 
@@ -96,13 +96,14 @@ export class DriveService {
       this.logger.log(`Uploaded to Drive: ${fileName} (${file.data.id})`);
 
       return {
-        fileId: file.data.id,
+        fileId: file.data.id || '',
         fileUrl: `https://drive.google.com/file/d/${file.data.id}/view`,
         fileName,
       };
-    } catch (error) {
-      this.logger.error(`Failed to upload to Drive: ${error.message}`);
-      throw new Error(`Drive upload error: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`Failed to upload to Drive: ${errorMessage}`);
+      throw new Error(`Drive upload error: ${errorMessage}`);
     }
   }
 
@@ -149,15 +150,18 @@ export class DriveService {
           mimeType,
           folderId,
         );
-      } catch (error: any) {
-        lastError = error;
+      } catch (error: unknown) {
+        lastError = error instanceof Error ? error : new Error(String(error));
         this.logger.warn(
-          `Upload attempt ${attempt}/${maxRetries} failed: ${error.message}`,
+          `Upload attempt ${attempt}/${maxRetries} failed: ${lastError.message}`,
         );
 
         // Don't retry on 4xx errors (client errors)
-        if (error.response?.status && error.response.status < 500) {
-          throw error;
+        if (error instanceof Error && 'response' in error) {
+          const errWithResp = error as any;
+          if (errWithResp.response?.status && errWithResp.response.status < 500) {
+            throw error;
+          }
         }
 
         await new Promise((resolve) =>

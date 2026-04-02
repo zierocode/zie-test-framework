@@ -9,23 +9,24 @@ import {
   UseInterceptors,
   ClassSerializerInterceptor,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiBadRequestError,
-  ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
+// TODO: Uncomment when swagger is installed
+// import {
+//   ApiTags,
+//   ApiCreatedResponse,
+//   ApiOkResponse,
+//   ApiBadRequestError,
+//   ApiUnauthorizedResponse,
+// } from '@nestjs/swagger';
 import { CreateJobDto, UpdateJobDto, JobFilterDto } from '../dtos/create-job.dto';
 
-@ApiTags('jobs')
+// @ApiTags('jobs')
 @Controller('jobs')
 @UseInterceptors(ClassSerializerInterceptor)
 export class JobsController {
   @Get()
-  @ApiOkResponse({
-    description: 'List of all jobs with optional filtering',
-  })
+  // @ApiOkResponse({
+  //   description: 'List of all jobs with optional filtering',
+  // })
   findAll(@Query() filter: JobFilterDto) {
     return {
       jobs: [],
@@ -36,9 +37,9 @@ export class JobsController {
   }
 
   @Get(':id')
-  @ApiOkResponse({
-    description: 'Get job by ID',
-  })
+  // @ApiOkResponse({
+  //   description: 'Get job by ID',
+  // })
   findOne(@Param('id') id: string) {
     return {
       id,
@@ -49,9 +50,9 @@ export class JobsController {
   }
 
   @Post()
-  @ApiCreatedResponse({
-    description: 'Create a new job',
-  })
+  // @ApiCreatedResponse({
+  //   description: 'Create a new job',
+  // })
   create(@Body() createJobDto: CreateJobDto) {
     return {
       id: `job-${Date.now()}`,
@@ -62,9 +63,9 @@ export class JobsController {
   }
 
   @Patch(':id')
-  @ApiOkResponse({
-    description: 'Update job status or data',
-  })
+  // @ApiOkResponse({
+  //   description: 'Update job status or data',
+  // })
   update(@Param('id') id: string, @Body() updateJobDto: UpdateJobDto) {
     return {
       id,
@@ -74,13 +75,13 @@ export class JobsController {
   }
 }
 
-@ApiTags('agents')
+// @ApiTags('agents')
 @Controller('agents')
 export class AgentsController {
   @Get()
-  @ApiOkResponse({
-    description: 'List all agents with status',
-  })
+  // @ApiOkResponse({
+  //   description: 'List all agents with status',
+  // })
   findAll() {
     return [
       { id: 'agent-001', hostname: 'mac-1', status: 'idle' },
@@ -89,21 +90,21 @@ export class AgentsController {
   }
 
   @Get(':id')
-  @ApiOkResponse({
-    description: 'Get agent by ID',
-  })
+  // @ApiOkResponse({
+  //   description: 'Get agent by ID',
+  // })
   findOne(@Param('id') id: string) {
     return { id, hostname: 'mac-1', status: 'idle' };
   }
 }
 
-@ApiTags('projects')
+// @ApiTags('projects')
 @Controller('projects')
 export class ProjectsController {
   @Get()
-  @ApiOkResponse({
-    description: 'List all configured projects',
-  })
+  // @ApiOkResponse({
+  //   description: 'List all configured projects',
+  // })
   findAll() {
     return [
       { id: 'proj-001', name: 'Test Project', active: true },

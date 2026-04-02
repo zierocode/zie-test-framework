@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 describe('JobController', () => {
   it('should create a new job with valid data', () => {
@@ -6,30 +6,28 @@ describe('JobController', () => {
       title: 'Test Job',
       storyUrl: 'https://notion.so/story/123',
       projectId: 'proj-001',
-      status: 'pending',
     };
 
     expect(createJobDto.title).toBe('Test Job');
     expect(createJobDto.storyUrl).toBe('https://notion.so/story/123');
     expect(createJobDto.projectId).toBe('proj-001');
-    expect(createJobDto.status).toBe('pending');
   });
 
   it('should reject job creation without required fields', () => {
     const invalidDto = {
       title: 'Test Job',
-      // Missing storyUrl and projectId
     };
 
-    expect(invalidDto.storyUrl).toBeUndefined();
-    expect(invalidDto.projectId).toBeUndefined();
+    expect('storyUrl' in invalidDto).toBe(false);
+    expect('projectId' in invalidDto).toBe(false);
   });
 
   it('should filter jobs by status', () => {
+    type JobStatus = 'pending' | 'running' | 'completed';
     const jobs = [
-      { id: 'job-1', status: 'pending', agentId: null },
-      { id: 'job-2', status: 'running', agentId: 'agent-001' },
-      { id: 'job-3', status: 'completed', agentId: 'agent-002' },
+      { id: 'job-1', status: 'pending' as JobStatus, agentId: null },
+      { id: 'job-2', status: 'running' as JobStatus, agentId: 'agent-001' },
+      { id: 'job-3', status: 'completed' as JobStatus, agentId: 'agent-002' },
     ];
 
     const pendingJobs = jobs.filter((j) => j.status === 'pending');
@@ -40,20 +38,21 @@ describe('JobController', () => {
   });
 
   it('should allow job status updates', () => {
-    let job = { id: 'job-1', status: 'pending' };
+    type JobStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
+    let job = { id: 'job-1', status: 'pending' as JobStatus };
 
-    job = { ...job, status: 'running' };
-    expect(job.status).toBe('running');
+    job = { ...job, status: 'running' as JobStatus };
+    expect((job.status as string)).toBe('running');
 
-    job = { ...job, status: 'completed' };
-    expect(job.status).toBe('completed');
+    job = { ...job, status: 'completed' as JobStatus };
+    expect((job.status as string)).toBe('completed');
   });
 
   it('should list agents with their status', () => {
     const agents = [
-      { id: 'agent-001', hostname: 'mac-1', status: 'idle' },
-      { id: 'agent-002', hostname: 'win-1', status: 'busy' },
-      { id: 'agent-003', hostname: 'mac-2', status: 'idle' },
+      { id: 'agent-001', hostname: 'mac-1', status: 'idle' as const },
+      { id: 'agent-002', hostname: 'win-1', status: 'busy' as const },
+      { id: 'agent-003', hostname: 'mac-2', status: 'idle' as const },
     ];
 
     const idleAgents = agents.filter((a) => a.status === 'idle');

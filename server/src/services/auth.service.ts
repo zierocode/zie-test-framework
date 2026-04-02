@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OAuth2Client } from 'google-auth-library';
 
 export interface User {
   id: string;
   email: string;
-  name: string;
-  picture: string;
+  name?: string;
+  picture?: string;
   roles: string[];
 }
 
@@ -22,6 +22,7 @@ export interface Session {
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   private oauth2Client: OAuth2Client;
 
   constructor(private configService: ConfigService) {
@@ -56,7 +57,7 @@ export class AuthService {
   async verifyIdToken(idToken: string): Promise<User> {
     try {
       const ticket = await this.oauth2Client.verifyIdToken({
-        idToken: idToken,
+        idToken,
         audience: this.configService.get<string>('GOOGLE_CLIENT_ID'),
       });
 
@@ -65,15 +66,18 @@ export class AuthService {
         throw new Error('Invalid ID token payload');
       }
 
+      const userPayload = payload as any;
+
       return {
-        id: payload.sub,
-        email: payload.email,
-        name: payload.name,
-        picture: payload.picture,
+        id: userPayload.sub,
+        email: userPayload.email,
+        name: userPayload.name ? String(userPayload.name) : undefined,
+        picture: userPayload.picture ? String(userPayload.picture) : undefined,
         roles: ['user'],
       };
-    } catch (error) {
-      throw new Error(`Token verification failed: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? String(error.message) : 'Unknown error';
+      throw new Error(`Token verification failed: ${errorMessage}`);
     }
   }
 
@@ -93,18 +97,37 @@ export class AuthService {
       url: 'https://www.googleapis.com/oauth2/v2/userinfo',
     });
 
+    const data = userInfo.data as any;
+
     return {
-      userId: userInfo.data.id,
-      email: userInfo.data.email,
-      name: userInfo.data.name,
-      avatar: userInfo.data.picture,
+      userId: data.id,
+      email: data.email,
+      name: data.name ? String(data.name) : 'Unknown',
+      avatar: data.picture ? String(data.picture) : '',
       accessToken: tokens.access_token,
-      refreshToken: tokens.refresh_token,
+      refreshToken: tokens.refresh_token || '',
       createdAt: new Date().toISOString(),
     };
   }
 
-  refreshAccessToken(refreshToken: string): Promise<{ access_token: string }> {
-    return this.oauth2Client.refreshAccessToken(refreshToken);
+  async refreshAccessToken(refreshToken: string): Promise<{ access_token: string }> {
+    try {
+      // Use request method to refresh token manually
+      const res = await this.oauth2Client.request({
+        method: 'POST',
+        url: 'https://oauth2.googleapis.com/token',
+        data: {
+          grant_type: 'refresh_token',
+          refresh_token: refreshToken,
+          client_id: this.configService.get<string>('GOOGLE_CLIENT_ID'),
+          client_secret: this.configService.get<string>('GOOGLE_CLIENT_SECRET'),
+        },
+      });
+      const response = res.data as any;
+      return { access_token: response.access_token };
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? String(error.message) : 'Unknown error';
+      throw new Error(`Refresh token failed: ${errorMessage}`);
+    }
   }
 }

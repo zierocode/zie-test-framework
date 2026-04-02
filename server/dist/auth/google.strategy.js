@@ -1,9 +1,9 @@
+"use strict";
 // import { Strategy } from 'passport-google-oauth20';
 // import { PassportStrategy } from '@nestjs/passport';
 // import { Injectable, UnauthorizedException } from '@nestjs/common';
 // import { ConfigService } from '@nestjs/config';
 // import { AuthService } from '../services/auth.service';
-
 // @Injectable()
 // export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
 //   constructor(
@@ -20,7 +20,6 @@
 //       scope: ['profile', 'email', 'openid'],
 //     });
 //   }
-
 //   async validate(
 //     accessToken: string,
 //     refreshToken: string,

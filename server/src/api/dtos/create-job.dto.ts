@@ -1,7 +1,7 @@
 export class CreateJobDto {
-  title: string;
-  storyUrl: string;
-  projectId: string;
+  title!: string;
+  storyUrl!: string;
+  projectId!: string;
   priority?: 'low' | 'medium' | 'high';
   tags?: string[];
 }

@@ -1,6 +1,6 @@
 ---
-approved: false
-approved_at:
+approved: true
+approved_at: 2026-04-02
 backlog: backlog/ztf-server-based-architecture.md
 ---
 

@@ -5,7 +5,7 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { Logger, Injectable } from '@nestjs/common';
 
 export interface AgentRegistration {
@@ -35,17 +35,17 @@ export class AgentsGateway
   private agents: Map<string, AgentSession> = new Map();
 
   @WebSocketServer()
-  server: Server;
+  server!: Server;
 
   afterInit() {
     this.logger.log('WebSocket server initialized');
   }
 
-  handleConnection(client: Socket) {
+  handleConnection(client: any) {
     this.logger.log(`Client connected: ${client.id}`);
   }
 
-  handleDisconnect(client: Socket) {
+  handleDisconnect(client: any) {
     this.logger.log(`Client disconnected: ${client.id}`);
     // Find and remove agent associated with this client
     for (const [agentId, session] of this.agents.entries()) {

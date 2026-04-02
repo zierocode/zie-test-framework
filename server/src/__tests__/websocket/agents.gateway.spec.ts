@@ -1,21 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { describe, it, expect } from 'vitest';
 
 describe('AgentsGateway', () => {
-  let gateway: any;
-  let mockServer: any;
-
-  beforeEach(() => {
-    mockServer = {
-      on: vi.fn(),
-      emit: vi.fn(),
-      to: vi.fn(),
-      broadcast: { emit: vi.fn() },
-    };
-    vi.clearAllMocks();
-  });
-
   it('should validate agent registration with required fields', () => {
     const registration = {
       agentId: 'agent-001',
@@ -34,7 +19,7 @@ describe('AgentsGateway', () => {
       capabilities: ['playwright'],
     };
 
-    expect(invalidRegistration.agentId).toBeUndefined();
+    expect('agentId' in invalidRegistration).toBe(false);
   });
 
   it('should handle duplicate agent ID by merging session', () => {
@@ -68,7 +53,7 @@ describe('AgentsGateway', () => {
 
     // Simulate broadcast
     const broadcastMessage = {
-      type: 'job_available',
+      type: 'job_available' as const,
       ...jobPayload,
     };
 

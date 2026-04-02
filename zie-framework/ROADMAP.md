@@ -10,13 +10,17 @@
 
 <!-- Plans approved by Zie, ready to build. Pull into Now when slot is free. -->
 
+- [x] ZTF Server-Based Architecture — [plan](plans/2026-04-02-ztf-server-based-architecture.md)
+
 ---
 
 ## Now — Active Sprint
 
 <!-- Current feature in progress. One at a time (WIP=1). -->
 
-- [ ] Initial setup complete — see [spec](specs/) [plan](plans/)
+- [ ] ZTF Server-Based Architecture —
+  [spec](specs/2026-04-02-ztf-server-based-architecture-design.md)
+  [plan](plans/2026-04-02-ztf-server-based-architecture.md)
 
 ---
 
