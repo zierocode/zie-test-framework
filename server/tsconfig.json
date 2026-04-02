@@ -4,7 +4,7 @@
     "lib": ["ES2021"],
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "moduleSuffix": ".js",
+    "moduleSuffixes": [".js"],
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
