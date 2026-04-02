@@ -25,8 +25,8 @@ WORKDIR /app/server
 # Copy package files
 COPY server/package*.json ./
 
-# Install production dependencies only
-RUN npm ci --only=production
+# Install production dependencies only (omit dev deps)
+RUN npm ci --omit=dev
 
 # Copy built artifacts from builder
 COPY --from=builder /app/server/dist ./dist
