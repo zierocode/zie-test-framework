@@ -3,8 +3,14 @@
 # This file is auto-included by the base Makefile via: -include Makefile.local
 
 # ── Tests ─────────────────────────────────────────────────────────────────────
-test-unit: ## Run unit tests
+test-unit: ## Run unit tests (server + agent)
 	npx vitest run --reporter=dot
+
+test-unit-server: ## Run server unit tests
+	cd server && npx vitest run --reporter=dot
+
+test-unit-agent: ## Run agent unit tests
+	cd agent && npx vitest run --reporter=dot
 
 test-int: ## Run integration tests
 	npx vitest run --project=integration

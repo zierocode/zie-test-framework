@@ -1,0 +1,30 @@
+{
+  "name": "@zie/agent-app",
+  "version": "0.1.0",
+  "description": "ZTF Agent - Local test execution client",
+  "type": "module",
+  "bin": {
+    "ztf-agent": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@zie/agent": "0.1.0",
+    "commander": "^11.0.0",
+    "dotenv": "^16.0.0",
+    "ws": "^8.0.0",
+    "playwright": "^1.40.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/ws": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

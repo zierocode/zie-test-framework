@@ -1,3 +1,5 @@
 zie-framework/backlog/
 zie-framework/specs/
 zie-framework/plans/
+node_modules/
+**/node_modules/
