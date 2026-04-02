@@ -2,6 +2,13 @@
 # Copy to Makefile.local (gitignore-able or commit as-is).
 # This file is auto-included by the base Makefile via: -include Makefile.local
 
+# ── VPS Configuration for Production Deploy ───────────────────────────────────
+VPS_USER ?= zie
+VPS_HOST ?= zie-vps
+
+# Docker Hub configuration
+DOCKER_HUB_USER ?= zie
+
 # ── Tests ─────────────────────────────────────────────────────────────────────
 test-unit: ## Run unit tests (server + agent)
 	npx vitest run --reporter=dot
@@ -35,22 +42,32 @@ _stop-dev:
 	@echo "Stop dev server manually (Ctrl+C)"
 
 _deploy-prod:
-	# Example: deploy to Vercel
-	# npx vercel --prod
-	@echo "Deploy to prod — override _deploy-prod in Makefile.local"
+	# Deploy to VPS via Docker
+	$(MAKE) _publish
 
 # ── Version bumping ───────────────────────────────────────────────────────────
 _bump-extra:
 	# Update package.json version
 	npm version $(NEW) --no-git-tag-version || true
 
-# ── Publish ───────────────────────────────────────────────────────────────────
-_publish:
-	# Example: publish to npm
-	# npm publish
-	# Or create GitHub release:
-	# gh release create v$(NEW) --title "v$(NEW)" --generate-notes || true
-	@true
+# ── Publish/Deploy ────────────────────────────────────────────────────────────
+# Deploy via GitHub: push code, VPS pulls and builds
+# VPS must have git access to this repo and docker-compose installed
+_publish: ## Publish release — deploy to VPS via GitHub
+	@echo "=== Deploying v$(NEW) to VPS ($(VPS_HOST)) ==="
+	@echo "Step 1: Pushing code to GitHub..."
+	@git push origin dev
+	@echo "Step 2: Deploying to VPS via GitHub..."
+	@ssh -o StrictHostKeyChecking=no $(VPS_USER)@$(VPS_HOST) "cd ~/zie-test-framework && git pull origin dev"
+	@ssh -o StrictHostKeyChecking=no $(VPS_USER)@$(VPS_HOST) "cd ~/zie-test-framework && docker-compose build ztf-api"
+	@ssh -o StrictHostKeyChecking=no $(VPS_USER)@$(VPS_HOST) "cd ~/zie-test-framework && docker-compose up -d"
+	@echo "Step 3: Verifying deployment..."
+	@ssh -o StrictHostKeyChecking=no $(VPS_USER)@$(VPS_HOST) "cd ~/zie-test-framework && docker-compose ps"
+	@echo ""
+	@echo "=== Deployment complete ==="
+	@echo "API: http://$(VPS_HOST):3001 (Caddy proxy on port 3001)"
+	@echo ""
+	@echo "Check logs: ssh $(VPS_USER)@$(VPS_HOST) 'cd ~/zie-test-framework && docker-compose logs -f ztf-api'"
 
 # ── Setup ─────────────────────────────────────────────────────────────────────
 _setup-extra:

@@ -3,16 +3,11 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app/server
 
-# Copy package files
-COPY package*.json ./
-COPY server/package*.json ./server/
+# Copy all server files
+COPY server/ ./
 
-# Install dependencies
+# Install dependencies (including dev deps for build)
 RUN npm install
-
-# Copy source code
-COPY server/src ./server/src
-COPY server/tsconfig.json ./
 
 # Build
 RUN npm run build
@@ -22,11 +17,13 @@ FROM node:20-alpine AS production
 
 WORKDIR /app/server
 
-# Install production dependencies
+# Copy package files
 COPY server/package*.json ./
+
+# Install production dependencies only
 RUN npm install --production
 
-# Copy built artifacts
+# Copy built artifacts from builder
 COPY --from=builder /app/server/dist ./dist
 
 # Create non-root user
