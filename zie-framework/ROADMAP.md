@@ -24,7 +24,7 @@
 
 <!-- Ready to start. Ordered by priority. -->
 
-- [ ] (add features here after /zie-idea)
+- [ ] ZTF Server-Based Architecture — [backlog](backlog/ztf-server-based-architecture.md)
 
 ---
 
