@@ -1,0 +1,9 @@
+{
+  "name": "zie-test-framework",
+  "version": "1.0.0",
+  "description": "AI Automated Testing Framework - Server-Based Architecture",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
