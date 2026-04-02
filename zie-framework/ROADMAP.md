@@ -18,9 +18,9 @@
 
 <!-- Current feature in progress. One at a time (WIP=1). -->
 
-- [ ] ZTF Server-Based Architecture —
+- [x] ZTF Server-Based Architecture —
   [spec](specs/2026-04-02-ztf-server-based-architecture-design.md)
-  [plan](plans/2026-04-02-ztf-server-based-architecture.md)
+  [plan](plans/2026-04-02-ztf-server-based-architecture.md) ✓ completed
 
 ---
 
@@ -45,6 +45,17 @@
 <!-- Completed items. Never delete — this is history. -->
 
 - [x] Project initialized with zie-framework — 2026-04-02
+- [x] ZTF Server-Based Architecture — 2026-04-02 (Tasks 1-8)
+
+## Summary: ZTF Server-Based Architecture
+
+- **Server**: NestJS + PostgreSQL + WebSocket + REST API + Google OAuth +
+  Notion API + Google Drive
+- **Agent SDK**: Shared utilities (`@zie/agent`)
+- **Agent App**: CLI with Playwright + LLM integration
+- **Deployment**: Docker + CI/CD pipeline
+
+All 25 tests pass. TypeScript builds successfully.
 
 ---
 
