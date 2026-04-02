@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+agent/node_modules/
+server/node_modules/
+
+# Build outputs
+dist/
+agent/dist/
+server/dist/
+
+# Vitest cache
+.node_modules/.vite/
+agent/node_modules/.vite/
+server/node_modules/.vite/
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment files (keep .env.example)
+.env
+.env.*
+
+# Test coverage
+coverage/
